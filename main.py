@@ -1,6 +1,7 @@
 from osc_client import OSCClient
 from visualization import Visualization
 import threading
+from p5 import run_sketch  # Importiere p5 für die Visualisierung
 
 def start_osc_server():
     # Initialisiere den OSC-Client (mit der IP-Adresse und dem Port des OSC-Servers)
