@@ -1,22 +1,32 @@
-from p5 import run, setup, draw
-from visualization import Visualization
 from osc_client import OSCClient
+from visualization import Visualization
+import threading
 
-def main():
-    # OSCClient für die Kommunikation mit dem iPhone
-    osc_client = OSCClient(ip="192.168.1.100", port=8000)  # IP-Adresse des iPhones
+def start_osc_server():
+    # Initialisiere den OSC-Client (mit der IP-Adresse und dem Port des OSC-Servers)
+    osc_client = OSCClient(ip="192.168.1.100", port=8000)
+    
+    # Starte den OSC-Server in einem separaten Thread
+    osc_thread = threading.Thread(target=osc_client.start)
+    osc_thread.daemon = True  # Der Thread wird beendet, wenn das Hauptprogramm beendet wird
+    osc_thread.start()
 
-    # Visualisierungsklasse initialisieren
+    return osc_client
+
+def setup_visualization(osc_client):
+    # Initialisiere die Visualisierung und übergebe den OSC-Client
     visualization = Visualization(osc_client)
+    return visualization
 
-    # Setup und Draw Methoden für p5
-    def p5_setup():
-        visualization.setup()
+def run():
+    # Starte den OSC-Server und erhalte den OSC-Client
+    osc_client = start_osc_server()
 
-    def p5_draw():
-        visualization.draw()
-
-    run()
+    # Initialisiere die Visualisierung mit dem OSC-Client
+    visualization = setup_visualization(osc_client)
+    
+    # Starte die p5-Visualisierung
+    run_sketch(visualization)
 
 if __name__ == "__main__":
-    main()
+    run()
