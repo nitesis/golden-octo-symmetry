@@ -32,7 +32,7 @@ def run():
     visualization = setup_visualization(osc_client)
     
     # Starte die p5-Visualisierung
-    run_sketch(visualization)
+    run(visualization)
 
 if __name__ == "__main__":
     run()
