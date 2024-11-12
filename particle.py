@@ -1,7 +1,8 @@
 # Particle class for simulating particles in a particle system
 
 import random
-from p5 import PVector
+import p5
+from pvector import PVector
 
 class Particle:
     def __init__(self, x, y):
