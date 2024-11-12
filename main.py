@@ -1,9 +1,7 @@
 from osc_client import OSCClient
 from visualization import Visualization
 import threading
-from p5 import run_sketch  # Importiere p5 für die Visualisierung
-import osc
-import p5
+from p5 import run  # Importiere p5 für die Visualisierung
 
 print("Pakete erfolgreich geladen!")
 
@@ -24,7 +22,7 @@ def setup_visualization(osc_client):
     visualization = Visualization(osc_client)
     return visualization
 
-def run():
+def run_visualization():
     # Starte den OSC-Server und erhalte den OSC-Client
     osc_client = start_osc_server()
 
@@ -32,7 +30,7 @@ def run():
     visualization = setup_visualization(osc_client)
     
     # Starte die p5-Visualisierung
-    run(visualization)
+    run() 
 
 if __name__ == "__main__":
     run()
