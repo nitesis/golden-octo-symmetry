@@ -1,7 +1,7 @@
 # Particle class for simulating particles in a particle system
 
 import random
-import p5
+from p5 import *  # Importiere p5 für die Visualisierung
 from pvector import PVector
 
 class Particle:

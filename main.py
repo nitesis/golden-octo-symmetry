@@ -1,36 +1,52 @@
-from osc_client import OSCClient
-from visualization import Visualization
+from pythonosc import dispatcher, osc_server
 import threading
-from p5 import run  # Importiere p5 für die Visualisierung
+from p5 import *
 
-print("Pakete erfolgreich geladen!")
+# Variables to hold the received coordinates
+x_pos, y_pos = 300, 300  # Start in the center
 
+# Function to handle OSC data, update x and y positions
+def handle_osc_data(address, *args):
+    print(f"Received data from {address}: {args}")
+    global x_pos, y_pos
+    # x_pos, y_pos = args  # Update position with received coordinates
 
-def start_osc_server():
-    # Initialisiere den OSC-Client (mit der IP-Adresse und dem Port des OSC-Servers)
-    osc_client = OSCClient(ip="192.168.1.100", port=8000)
+    if len(args) >= 2:
+        x_pos, y_pos = args[:2]  # Nimmt nur die ersten zwei Argumente
+    else:
+        print("Insufficient arguments received.")
     
-    # Starte den OSC-Server in einem separaten Thread
-    osc_thread = threading.Thread(target=osc_client.start)
-    osc_thread.daemon = True  # Der Thread wird beendet, wenn das Hauptprogramm beendet wird
-    osc_thread.start()
+    try:
+        print(f"Received OSC message at {address} with arguments: {args}")
+    except Exception as e:
+        print(f"Error in handling OSC data: {e}")
 
-    return osc_client
+# OSC client setup
+def start_osc_server(ip="192.168.1.129", port=12345):
+    disp = dispatcher.Dispatcher()
+    disp.map("/hand", handle_osc_data)  # Expecting data on the "/hand" address
 
-def setup_visualization(osc_client):
-    # Initialisiere die Visualisierung und übergebe den OSC-Client
-    visualization = Visualization(osc_client)
-    return visualization
+    server = osc_server.ThreadingOSCUDPServer((ip, port), disp)
+    print(f"OSC Server running on {ip}:{port}")
+    server_thread = threading.Thread(target=server.serve_forever)
+    server_thread.daemon = True  # Stops server on main thread exit
+    server_thread.start()
 
-def run_visualization():
-    # Starte den OSC-Server und erhalte den OSC-Client
-    osc_client = start_osc_server()
+def setup():
+    size(600, 600)
+    no_stroke()
+    # start_osc_server()  # Start the OSC server when the sketch begins
 
-    # Initialisiere die Visualisierung mit dem OSC-Client
-    visualization = setup_visualization(osc_client)
-    
-    # Starte die p5-Visualisierung
-    run() 
+# p5 draw function
+def draw():
+    background(255)  # White background
+    fill(0, 0, 255)  # Blue fill for the circle
+    print(f"x_pos: {x_pos}, y_pos: {y_pos}")  # Debugging
+    # Test mit festen Werten
+    ellipse(x_pos, y_pos, 50, 50)
+    no_loop()  # This stops the draw loop after one frame
 
+  
+# Start the p5 sketch
 if __name__ == "__main__":
     run()
